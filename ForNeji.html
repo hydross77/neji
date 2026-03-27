@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>For Neji</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f1a;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #0f0f1a;
+      border: 2px solid #2a2a3d;
+      border-radius: 16px;
+      padding: 36px 48px;
+      width: 580px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #eb459e;
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    #progress {
+      color: #7289da;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid #2a2a3d;
+      margin-bottom: 20px;
+    }
+
+    #question {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 200px;
+      transition: opacity 0.15s;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .btn-blue { background: #5865F2; }
+    .btn-pink  { background: #eb459e; }
+
+    #status {
+      font-size: 14px;
+      min-height: 22px;
+      font-weight: 500;
+    }
+
+    .correct { color: #57F287; }
+    .wrong   { color: #ED4245; }
+
+    #end-screen {
+      display: none;
+    }
+
+    #end-screen p {
+      color: white;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    #end-screen h2 {
+      color: #eb459e;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div id="quiz-screen">
+    <h1>For Neji</h1>
+    <div id="progress"></div>
+    <hr />
+    <div id="question"></div>
+    <div class="buttons" id="buttons"></div>
+    <div id="status"></div>
+  </div>
+
+  <div id="end-screen">
+    <h2>For Neji</h2>
+    <p>PAS SI COMPLIQUÉ DE PAS ÊTRE TÊTU TU VOIS 😄</p>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      text: "Qui a toujours raison ?",
+      choices: [
+        { label: "Tiffany 👑",  correct: true,  feedback: "Evidemment ! On passe à la suite 😏" },
+        { label: "Jordan",      correct: false, feedback: "Mauvaise réponse... réfléchis bien 🤔" },
+      ]
+    },
+    {
+      text: "Qui est la plus belle ? 💅",
+      choices: [
+        { label: "Tiffany ✨",       correct: true,  feedback: "Bonne réponse, évidemment ! 💖 On continue" },
+        { label: "Tes autres copines", correct: false, feedback: "Mauvaise réponse... :O !" },
+      ]
+    },
+    {
+      text: "Est-ce que Darwin va bientôt déménager ? 📦",
+      choices: [
+        { label: "Oui !",  correct: true,  feedback: "Exactement ! Grande nouvelle 🎉 On passe à la suite !" },
+        { label: "Non...", correct: false, feedback: "Mauvaise réponse, reste sur cette question 😅" },
+      ]
+    },
+    {
+      text: "Est-ce que la Monster c'est bon pour la santé ? 🥤",
+      choices: [
+        { label: "Oui bien sûr",         correct: false, feedback: "Mauvaise réponse 💀 Tu sais très bien que non..." },
+        { label: "Non, je vais arrêter",  correct: true,  feedback: "BONNE RÉPONSE ! Sage décision 🌿✨" },
+      ]
+    },
+    {
+      text: "Naruto ou Bleach ? ⚔️",
+      choices: [
+        { label: "Naruto 🍜", correct: false, feedback: "Mauvaise réponse... dommage 😬" },
+        { label: "Bleach ☠️", correct: true,  feedback: "Bleach top 1 mais j'adore regarder Naruto avec toi ❤️" },
+      ]
+    },
+  ];
+
+  let current = 0;
+  let locked = false;
+
+  function render() {
+    const q = questions[current];
+    document.getElementById('progress').textContent = `Question ${current + 1} / ${questions.length}`;
+    document.getElementById('question').textContent = q.text;
+    document.getElementById('status').textContent = '';
+    document.getElementById('status').className = '';
+    locked = false;
+
+    const btns = document.getElementById('buttons');
+    btns.innerHTML = '';
+    q.choices.forEach((choice, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = choice.label;
+      btn.className = i % 2 === 0 ? 'btn-blue' : 'btn-pink';
+      btn.onclick = () => answer(choice.correct, choice.feedback);
+      btns.appendChild(btn);
+    });
+  }
+
+  function answer(correct, feedback) {
+    if (locked) return;
+    const status = document.getElementById('status');
+    if (correct) {
+      locked = true;
+      status.textContent = '✅  ' + feedback;
+      status.className = 'correct';
+      current++;
+      setTimeout(() => {
+        if (current < questions.length) render();
+        else endGame();
+      }, 1800);
+    } else {
+      status.textContent = '❌  ' + feedback;
+      status.className = 'wrong';
+    }
+  }
+
+  function endGame() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('end-screen').style.display = 'block';
+  }
+
+  render();
+</script>
+</body>
+</html>
