@@ -7,202 +7,163 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0f0f1a;
+      background: #07070f;
       font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      overflow: hidden;
+      perspective: 1200px;
     }
 
-    .card {
-      background: #0f0f1a;
-      border: 2px solid #2a2a3d;
-      border-radius: 16px;
-      padding: 36px 48px;
-      width: 580px;
-      text-align: center;
+    /* Ambient glow background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(235,69,158,0.07) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    h1 {
+    #trigger {
       color: #eb459e;
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
-
-    #progress {
-      color: #7289da;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-
-    hr {
-      border: none;
-      border-top: 2px solid #2a2a3d;
-      margin-bottom: 20px;
-    }
-
-    #question {
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 24px;
-      line-height: 1.4;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      padding: 12px 24px;
-      font-size: 14px;
-      font-weight: bold;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      border: none;
-      border-radius: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 18px 48px;
+      border: 2px solid #eb459e;
+      border-radius: 60px;
       cursor: pointer;
-      width: 200px;
-      transition: opacity 0.15s;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: transparent;
+      position: relative;
+      transition: box-shadow 0.3s, transform 0.3s, opacity 0.4s;
+      box-shadow:
+        0 0 18px rgba(235,69,158,0.35),
+        0 0 40px rgba(235,69,158,0.12),
+        inset 0 0 18px rgba(235,69,158,0.06);
     }
 
-    button:hover { opacity: 0.85; }
-
-    .btn-blue { background: #5865F2; }
-    .btn-pink  { background: #eb459e; }
-
-    #status {
-      font-size: 14px;
-      min-height: 22px;
-      font-weight: 500;
+    #trigger:hover {
+      transform: scale(1.06);
+      box-shadow:
+        0 0 30px rgba(235,69,158,0.7),
+        0 0 70px rgba(235,69,158,0.25),
+        inset 0 0 30px rgba(235,69,158,0.12);
     }
 
-    .correct { color: #57F287; }
-    .wrong   { color: #ED4245; }
-
-    #end-screen {
-      display: none;
+    #trigger.used {
+      pointer-events: none;
+      opacity: 0;
     }
 
-    #end-screen p {
-      color: white;
-      font-size: 16px;
-      line-height: 1.6;
+    /* ---- kisses ---- */
+    #stage {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      perspective: 900px;
+      transform-style: preserve-3d;
     }
 
-    #end-screen h2 {
-      color: #eb459e;
-      font-size: 22px;
-      margin-bottom: 16px;
+    .bisou {
+      position: absolute;
+      font-size: 64px;
+      opacity: 0;
+      will-change: transform, opacity;
+      transform-style: preserve-3d;
+      animation: pop3d 0.55s cubic-bezier(0.22, 1.6, 0.36, 1) forwards;
+      filter: drop-shadow(0 0 14px rgba(235,69,158,0.9))
+              drop-shadow(0 0 35px rgba(235,69,158,0.5));
+    }
+
+    @keyframes pop3d {
+      0% {
+        opacity: 0;
+        transform: translateZ(-500px) rotateY(var(--ry-start)) rotateX(var(--rx-start)) scale(0.05);
+      }
+      55% {
+        opacity: 1;
+        transform: translateZ(40px) rotateY(calc(var(--ry-start) * -0.08)) rotateX(calc(var(--rx-start) * -0.05)) scale(1.18);
+      }
+      75% {
+        transform: translateZ(-8px) rotateY(4deg) rotateX(-2deg) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateZ(0px) rotateY(0deg) rotateX(0deg) scale(1);
+      }
+    }
+
+    /* subtle float after appearing */
+    .bisou.floating {
+      animation: pop3d 0.55s cubic-bezier(0.22, 1.6, 0.36, 1) forwards,
+                 float 3s ease-in-out var(--float-delay) infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateZ(0); }
+      50%       { transform: translateY(-10px) translateZ(6px); }
     }
   </style>
 </head>
 <body>
-<div class="card">
-  <div id="quiz-screen">
-    <h1>For Neji</h1>
-    <div id="progress"></div>
-    <hr />
-    <div id="question"></div>
-    <div class="buttons" id="buttons"></div>
-    <div id="status"></div>
-  </div>
 
-  <div id="end-screen">
-    <h2>For Neji</h2>
-    <p>PAS SI COMPLIQUÉ DE PAS ÊTRE TÊTU TU VOIS 😄</p>
-  </div>
-</div>
+  <a id="trigger" href="#">Pour Neji 💋</a>
+  <div id="stage"></div>
 
-<script>
-  const questions = [
-    {
-      text: "Qui a toujours raison ?",
-      choices: [
-        { label: "Tiffany 👑",  correct: true,  feedback: "Evidemment ! On passe à la suite 😏" },
-        { label: "Jordan",      correct: false, feedback: "Mauvaise réponse... réfléchis bien 🤔" },
-      ]
-    },
-    {
-      text: "Qui est la plus belle ? 💅",
-      choices: [
-        { label: "Tiffany ✨",       correct: true,  feedback: "Bonne réponse, évidemment ! 💖 On continue" },
-        { label: "Tes autres copines", correct: false, feedback: "Mauvaise réponse... :O !" },
-      ]
-    },
-    {
-      text: "Est-ce que Darwin va bientôt déménager ? 📦",
-      choices: [
-        { label: "Oui !",  correct: true,  feedback: "Exactement ! Grande nouvelle 🎉 On passe à la suite !" },
-        { label: "Non...", correct: false, feedback: "Mauvaise réponse, reste sur cette question 😅" },
-      ]
-    },
-    {
-      text: "Est-ce que la Monster c'est bon pour la santé ? 🥤",
-      choices: [
-        { label: "Oui bien sûr",         correct: false, feedback: "Mauvaise réponse 💀 Tu sais très bien que non..." },
-        { label: "Non, je vais arrêter",  correct: true,  feedback: "BONNE RÉPONSE ! Sage décision 🌿✨" },
-      ]
-    },
-    {
-      text: "Naruto ou Bleach ? ⚔️",
-      choices: [
-        { label: "Naruto 🍜", correct: false, feedback: "Mauvaise réponse... dommage 😬" },
-        { label: "Bleach ☠️", correct: true,  feedback: "Bleach top 1 mais j'adore regarder Naruto avec toi ❤️" },
-      ]
-    },
-  ];
+  <script>
+    const trigger = document.getElementById('trigger');
+    const stage   = document.getElementById('stage');
 
-  let current = 0;
-  let locked = false;
+    // 9 positions spread nicely across the viewport
+    const spots = [
+      { top:  '12%', left: '18%' },
+      { top:   '8%', left: '48%' },
+      { top:  '15%', left: '76%' },
+      { top:  '44%', left:  '7%' },
+      { top:  '46%', left: '46%' },
+      { top:  '42%', left: '82%' },
+      { top:  '74%', left: '18%' },
+      { top:  '78%', left: '52%' },
+      { top:  '72%', left: '82%' },
+    ];
 
-  function render() {
-    const q = questions[current];
-    document.getElementById('progress').textContent = `Question ${current + 1} / ${questions.length}`;
-    document.getElementById('question').textContent = q.text;
-    document.getElementById('status').textContent = '';
-    document.getElementById('status').className = '';
-    locked = false;
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (trigger.classList.contains('used')) return;
+      trigger.classList.add('used');
 
-    const btns = document.getElementById('buttons');
-    btns.innerHTML = '';
-    q.choices.forEach((choice, i) => {
-      const btn = document.createElement('button');
-      btn.textContent = choice.label;
-      btn.className = i % 2 === 0 ? 'btn-blue' : 'btn-pink';
-      btn.onclick = () => answer(choice.correct, choice.feedback);
-      btns.appendChild(btn);
+      spots.forEach((pos, i) => {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'bisou';
+          el.textContent = '💋';
+          el.style.top  = pos.top;
+          el.style.left = pos.left;
+
+          // random 3-D entry angles for variety
+          const ryStart = (Math.random() - 0.5) * 360;
+          const rxStart = (Math.random() - 0.5) * 180;
+          el.style.setProperty('--ry-start', ryStart + 'deg');
+          el.style.setProperty('--rx-start', rxStart + 'deg');
+          el.style.setProperty('--float-delay', (0.55 + Math.random() * 0.3) + 's');
+
+          stage.appendChild(el);
+
+          // switch to floating class after pop animation ends
+          el.addEventListener('animationend', () => {
+            el.classList.add('floating');
+          }, { once: true });
+        }, i * 200);
+      });
     });
-  }
-
-  function answer(correct, feedback) {
-    if (locked) return;
-    const status = document.getElementById('status');
-    if (correct) {
-      locked = true;
-      status.textContent = '✅  ' + feedback;
-      status.className = 'correct';
-      current++;
-      setTimeout(() => {
-        if (current < questions.length) render();
-        else endGame();
-      }, 1800);
-    } else {
-      status.textContent = '❌  ' + feedback;
-      status.className = 'wrong';
-    }
-  }
-
-  function endGame() {
-    document.getElementById('quiz-screen').style.display = 'none';
-    document.getElementById('end-screen').style.display = 'block';
-  }
-
-  render();
-</script>
+  </script>
 </body>
 </html>
